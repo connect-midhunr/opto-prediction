@@ -67,6 +67,10 @@ if __name__ == '__main__':
 
         with col1:
             uploaded_image = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png", "bmp"])
+            
+            if uploaded_image:
+                image = Image.open(uploaded_image).convert("RGB")
+                st.image(image, caption='Uploaded Image', use_column_width=True)
 
         with col2:
             selected_disease = st.selectbox('Eye Disease', ['Cataract', 'Diabetic Retinopathy', 'Glaucoma'])
@@ -82,7 +86,3 @@ if __name__ == '__main__':
                 prediction = f"{' '.join(class_name.strip().split()[1:])} (Confidence Score: {round(confidence_score, 8)}%)"
 
             st.text_area("Result", prediction)
-            
-            if uploaded_image is not None:
-                image = Image.open(uploaded_image).convert("RGB")
-                st.image(image, caption='Uploaded Image', use_column_width=True)
