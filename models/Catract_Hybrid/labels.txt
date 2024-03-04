@@ -1,0 +1,4 @@
+0 Normal
+1 Cataract
+2 glaucoma
+3 Retina Diseases
