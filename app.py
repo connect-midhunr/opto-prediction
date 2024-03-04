@@ -53,9 +53,8 @@ if __name__ == '__main__':
         st.image('./images/collabll-logo.png')
 
     html_temp = """
-    
-    <div style="background-color:#bcd2e8;padding:10px;margin-bottom: 30px;">
-        <h2 style="color:#1e3f66;text-align:center;">Eye Disease Prediction</h2>
+    <div style="background-image: url('./images/bg-image.jpg');padding:10px;margin-bottom: 30px;">
+        <h2 style="color:white;text-align:center;">Eye Disease Prediction</h2>
     </div>
     """
     st.markdown(html_temp, unsafe_allow_html=True)
