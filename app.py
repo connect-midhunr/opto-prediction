@@ -3,13 +3,13 @@ from keras.models import load_model
 from PIL import Image, ImageOps  # Install pillow instead of PIL
 import numpy as np
 
-cataract_model = "./models/Catract_Hybrid/Catract_Hybrid_keras_model.h5"
+cataract_model = "./models/Catract_Hybrid/model.h5"
 cataract_label = "./models/Catract_Hybrid/labels.txt"
 
-dr_model = "./models/Diabetic_retinopathy/Diabetic_retinopathy_keras_model.h5"
+dr_model = "./models/Diabetic_retinopathy/model.h5"
 dr_label = "./models/Diabetic_retinopathy/labels.txt"
 
-glaucoma_model = "./models/Glaucoma/Glaucoma_keras_model.h5"
+glaucoma_model = "./models/Glaucoma/`model.h5"
 glaucoma_label = "./models/Glaucoma/labels.txt"
 
 def get_normalized_image_array(image):
