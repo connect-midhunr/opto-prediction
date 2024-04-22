@@ -9,7 +9,7 @@ cataract_label = "./models/Catract_Hybrid/labels.txt"
 dr_model = "./models/Diabetic_retinopathy/model.h5"
 dr_label = "./models/Diabetic_retinopathy/labels.txt"
 
-glaucoma_model = "./models/Glaucoma/`model.h5"
+glaucoma_model = "./models/Glaucoma/model.h5"
 glaucoma_label = "./models/Glaucoma/labels.txt"
 
 def get_normalized_image_array(image):
