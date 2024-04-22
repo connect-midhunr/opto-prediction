@@ -2,15 +2,23 @@ import streamlit as st
 from keras.models import load_model
 from PIL import Image, ImageOps  # Install pillow instead of PIL
 import numpy as np
+import os
 
-cataract_model = "./models/Catract_Hybrid/model.h5"
-cataract_label = "./models/Catract_Hybrid/labels.txt"
+# Get the absolute path of the current working directory
+current_directory = os.getcwd()
 
-dr_model = "./models/Diabetic_retinopathy/model.h5"
-dr_label = "./models/Diabetic_retinopathy/labels.txt"
+# # Navigate upwards until reaching the root directory
+# while not os.path.ismount(current_directory):
+#     current_directory = os.path.dirname(current_directory)
 
-glaucoma_model = "./models/Glaucoma/model.h5"
-glaucoma_label = "./models/Glaucoma/labels.txt"
+cataract_model = os.path.join(current_directory, "models", "Catract_Hybrid", "model.h5")
+cataract_label = os.path.join(current_directory, "models", "Catract_Hybrid", "labels.txt")
+
+dr_model = os.path.join(current_directory, "models", "Diabetic_retinopathy", "model.h5")
+dr_label = os.path.join(current_directory, "models", "Diabetic_retinopathy", "labels.txt")
+
+glaucoma_model = os.path.join(current_directory, "models", "Glaucoma", "model.h5")
+glaucoma_label = os.path.join(current_directory, "models", "Glaucoma", "labels.txt")
 
 def get_normalized_image_array(image):
     data_array = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
