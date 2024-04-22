@@ -4,6 +4,8 @@ from PIL import Image, ImageOps  # Install pillow instead of PIL
 import numpy as np
 import os
 import tensorflow as tf
+import time
+import math
 
 # Get the absolute path of the current working directory
 current_directory = os.getcwd()
@@ -85,13 +87,18 @@ if __name__ == '__main__':
             predict = st.form_submit_button(label='Get Prediction')
 
         if predict:
-            if selected_disease is None:
-                prediction = "Disease is not selected!"
-            elif image is None:
-                prediction = "Image is not uploaded!"
-            else:
-                class_name, confidence_score = predict_presence_of_disease(selected_disease, image)
-                prediction = f"{' '.join(class_name.strip().split()[1:])} (Confidence Score: {round(confidence_score, 8)}%)"
-                # prediction = f"{tf.__version__}"
+            with st.spinner("Model Loading..."):
+                if selected_disease is None:
+                    prediction = "Disease is not selected!"
+                elif image is None:
+                    prediction = "Image is not uploaded!"
+                else:
+                    start_time = time.time()
+                    class_name, confidence_score = predict_presence_of_disease(selected_disease, image)
+                    end_time = time.time()
+                    time_taken_in_seconds = end_time - start_time
+                    formatted_time_taken = f"Time taken: {int(time_taken_in_seconds // 60)} minutes and {round(time_taken_in_seconds % 60, 3)} seconds"
+                    prediction = f"{' '.join(class_name.strip().split()[1:])} (Confidence Score: {round(confidence_score, 8)}%)\n{formatted_time_taken}"
+                    # prediction = f"{tf.__version__}"
 
-            st.text_area("Result", prediction)
+                st.text_area("Result", prediction)
