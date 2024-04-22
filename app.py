@@ -3,6 +3,7 @@ from keras.models import load_model
 from PIL import Image, ImageOps  # Install pillow instead of PIL
 import numpy as np
 import os
+import tensorflow as tf
 
 # Get the absolute path of the current working directory
 current_directory = os.getcwd()
@@ -91,5 +92,6 @@ if __name__ == '__main__':
             else:
                 class_name, confidence_score = predict_presence_of_disease(selected_disease, image)
                 prediction = f"{' '.join(class_name.strip().split()[1:])} (Confidence Score: {round(confidence_score, 8)}%)"
+                # prediction = f"{tf.__version__}"
 
             st.text_area("Result", prediction)
