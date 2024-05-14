@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_modal import Modal
 from keras.models import load_model
 from PIL import Image, ImageOps  # Install pillow instead of PIL
 import numpy as np
@@ -7,21 +8,18 @@ import tensorflow as tf
 import time
 import math
 
+from components import css, progress_bars_template
+
 # Get the absolute path of the current working directory
 current_directory = os.getcwd()
 
-# # Navigate upwards until reaching the root directory
-# while not os.path.ismount(current_directory):
-#     current_directory = os.path.dirname(current_directory)
+combined_model = os.path.join(current_directory, "models", "Combined Model", "keras_model.h5")
+combined_label = os.path.join(current_directory, "models", "Combined Model", "labels.txt")
 
-cataract_model = os.path.join(current_directory, "models", "Catract_Hybrid", "model.h5")
-cataract_label = os.path.join(current_directory, "models", "Catract_Hybrid", "labels.txt")
-
-dr_model = os.path.join(current_directory, "models", "Diabetic_retinopathy", "model.h5")
-dr_label = os.path.join(current_directory, "models", "Diabetic_retinopathy", "labels.txt")
-
-glaucoma_model = os.path.join(current_directory, "models", "Glaucoma", "model.h5")
-glaucoma_label = os.path.join(current_directory, "models", "Glaucoma", "labels.txt")
+def is_blank_image(image):
+    if image.mode != 'RGB':
+        raise ValueError("Function is designed for RGB images only.")
+    return all(x == 0 for x in image.convert('L').getextrema())
 
 def get_normalized_image_array(image):
     data_array = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
@@ -32,46 +30,50 @@ def get_normalized_image_array(image):
 
     return data_array
 
-def predict_presence_of_disease(disease, image):
+def convert_prediction_result_to_dictionary(result):
+    max_value = max(result)
+    # Create a new array where only the maximum value remains unchanged, and others are set to 0
+    result_array = [round(value * 100) if value == max_value else 0 for value in result]
+    return {
+        "GLAUCOMA_PROBABILITY": result_array[0],
+        "CATARACT_PROBABILITY": result_array[1],
+        "DR_PROBABILITY": result_array[2],
+        "HR_PROBABILITY": result_array[4],
+        "BRVO_PROBABILITY": result_array[3],
+        "CRVO_PROBABILITY": result_array[5],
+        "RAO_PROBABILITY": result_array[6],
+    }
+
+def predict_presence_of_disease(image):
     np.set_printoptions(suppress=True)
 
-    if disease == "Cataract":
-        model_path = cataract_model
-        label_path = cataract_label
-    elif disease == "Diabetic Retinopathy":
-        model_path = dr_model
-        label_path = dr_label
-    elif disease == "Glaucoma":
-        model_path = glaucoma_model
-        label_path = glaucoma_label
-
+    model_path = combined_model
     model = load_model(model_path, compile=False)
-    class_names = open(label_path, "r").readlines()
     data_array = get_normalized_image_array(image)
     
-    prediction = model.predict(data_array)
-    index = np.argmax(prediction)
-    class_name = class_names[index]
-    confidence_score = prediction[0][index]
-
-    return class_name, confidence_score
+    return convert_prediction_result_to_dictionary(model.predict(data_array)[0])
 
 if __name__ == '__main__':
 
+    image_error_message = Modal("Image is not uploaded!", key="demo-modal", padding=20, max_width=744)
+    if image_error_message.is_open():
+        with image_error_message.container():
+            st.write("Please upload an image before clicking the 'Get Prediction' button.")
+
+    st.write(css, unsafe_allow_html=True)
     col1, col2, col3 = st.columns(3)
     
     with col2:
         st.image('./images/collabll-logo.png')
 
     html_temp = """
-    <div style="background-color:#bcd2e8;padding:10px;margin-bottom: 30px;">
-        <h2 style="color:#1e3f66;text-align:center;">Eye Disease Prediction</h2>
+    <div style="background-color:#262730;padding:10px;margin-bottom: 30px;">
+        <h2 style="color:#fff;text-align:center;">Eye Disease Prediction</h2>
     </div>
     """
     st.markdown(html_temp, unsafe_allow_html=True)
 
     with st.form(key='columns_in_form'):
-
         col1, col2 = st.columns(2)
         image = Image.new('RGB', (224, 224))
 
@@ -81,24 +83,30 @@ if __name__ == '__main__':
             if uploaded_image:
                 image = Image.open(uploaded_image).convert("RGB")
                 st.image(image, caption='Uploaded Image', use_column_width=True)
-
-        with col2:
-            selected_disease = st.selectbox('Eye Disease', ['Cataract', 'Diabetic Retinopathy', 'Glaucoma'])
+            
             predict = st.form_submit_button(label='Get Prediction')
 
-        if predict:
-            with st.spinner("Model Loading..."):
-                if selected_disease is None:
-                    prediction = "Disease is not selected!"
-                elif image is None:
-                    prediction = "Image is not uploaded!"
+        with col2:
+            if predict:
+                print("Image:", image)
+                if is_blank_image(image):
+                    image_error_message.open()
+                    print("Image is not uploaded!")
                 else:
-                    start_time = time.time()
-                    class_name, confidence_score = predict_presence_of_disease(selected_disease, image)
-                    end_time = time.time()
-                    time_taken_in_seconds = end_time - start_time
-                    formatted_time_taken = f"Time taken: {int(time_taken_in_seconds // 60)} minutes and {round(time_taken_in_seconds % 60, 3)} seconds"
-                    prediction = f"{' '.join(class_name.strip().split()[1:])} (Confidence Score: {round(confidence_score, 8)}%)\n{formatted_time_taken}"
-                    # prediction = f"{tf.__version__}"
+                    with st.spinner("Model Loading..."):
+                        start_time = time.time()
+                        predictions = predict_presence_of_disease(image)
+                        end_time = time.time()
+                        time_taken_in_seconds = end_time - start_time
 
-                st.text_area("Result", prediction)
+                        result_template = progress_bars_template.replace("{{GLAUCOMA_PROBABILITY}}", str(predictions["GLAUCOMA_PROBABILITY"]))
+                        result_template = result_template.replace("{{CATARACT_PROBABILITY}}", str(predictions["CATARACT_PROBABILITY"]))
+                        result_template = result_template.replace("{{DR_PROBABILITY}}", str(predictions["DR_PROBABILITY"]))
+                        result_template = result_template.replace("{{HR_PROBABILITY}}", str(100))
+                        result_template = result_template.replace("{{BRVO_PROBABILITY}}", str(predictions["BRVO_PROBABILITY"]))
+                        result_template = result_template.replace("{{CRVO_PROBABILITY}}", str(predictions["CRVO_PROBABILITY"]))
+                        result_template = result_template.replace("{{RAO_PROBABILITY}}", str(predictions["RAO_PROBABILITY"]))
+                        st.markdown(result_template, unsafe_allow_html=True)
+                        
+                        formatted_time_taken = f"Time taken: {int(time_taken_in_seconds // 60)} minutes and {round(time_taken_in_seconds % 60, 3)} seconds"
+                        st.write(formatted_time_taken)

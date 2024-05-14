@@ -1,0 +1,7 @@
+0 Glaucoma
+1 Cataract
+2 DR
+3 BRVO
+4 Hypertensive
+5 CRVO
+6 RAO
