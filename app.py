@@ -98,11 +98,11 @@ if __name__ == '__main__':
                         predictions = predict_presence_of_disease(image)
                         end_time = time.time()
                         time_taken_in_seconds = end_time - start_time
-
+                        
                         result_template = progress_bars_template.replace("{{GLAUCOMA_PROBABILITY}}", str(predictions["GLAUCOMA_PROBABILITY"]))
                         result_template = result_template.replace("{{CATARACT_PROBABILITY}}", str(predictions["CATARACT_PROBABILITY"]))
                         result_template = result_template.replace("{{DR_PROBABILITY}}", str(predictions["DR_PROBABILITY"]))
-                        result_template = result_template.replace("{{HR_PROBABILITY}}", str(100))
+                        result_template = result_template.replace("{{HR_PROBABILITY}}", str(predictions["HR_PROBABILITY"]))
                         result_template = result_template.replace("{{BRVO_PROBABILITY}}", str(predictions["BRVO_PROBABILITY"]))
                         result_template = result_template.replace("{{CRVO_PROBABILITY}}", str(predictions["CRVO_PROBABILITY"]))
                         result_template = result_template.replace("{{RAO_PROBABILITY}}", str(predictions["RAO_PROBABILITY"]))
