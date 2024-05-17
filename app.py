@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     html_temp = """
     <div style="background-color:#262730;padding:10px;margin-bottom: 30px;">
-        <h2 style="color:#fff;text-align:center;">Eye Disease Prediction</h2>
+        <h2 style="color:#fff;text-align:center;">Eyeanamy</h2>
     </div>
     """
     st.markdown(html_temp, unsafe_allow_html=True)
