@@ -96,7 +96,7 @@ progress_bars_template = """
     <div class="skill-box">
         <span class="title">Hypertensive Retinopathy</span>
         <div class="skill-bar">
-            <span class="skill-per" style="width: {{HYPERTENSIVE_PROBABILITY}}%">
+            <span class="skill-per" style="width: {{HR_PROBABILITY}}%">
                 <span class="tooltip">{{HR_PROBABILITY}}%</span>
             </span>
         </div>
